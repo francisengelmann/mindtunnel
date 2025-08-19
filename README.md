@@ -9,7 +9,7 @@ MindTunnel converts text (such as essays or papers) into an audio file -- listen
 
 First, set up the environment:
 ```bash
-conda create --name mindtunnel python=3.10
+conda create --name mindtunnel python=3.10 -y
 conda activate mindtunnel
 pip install -r requirements.txt
 ```
@@ -35,8 +35,8 @@ First get the essays
 python crawler.py
 ```
 
-Then convert them
+Then convert them. This will take a long time, so make sure to run it in tmux or similar.
 ```bash
-batch_convert.py
+python batch_all.py
 ```
 
