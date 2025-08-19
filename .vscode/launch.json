@@ -11,8 +11,8 @@
       "program": "text_to_speech.py",
       "console": "integratedTerminal",
       "args": [
-        "essays/words.txt",
-        "audio/words.mp3",
+        "essays/twitter.txt",
+        "audio/twitter.mp3",
       ]
     }
   ]

@@ -7,7 +7,6 @@ MindTunnel converts text (such as essays or papers) into an audio file -- listen
 
 ## Installation
 
-
 First, set up the environment:
 ```bash
 conda create --name mindtunnel python=3.10
@@ -29,3 +28,15 @@ Do the gcloud auth
 gcloud auth application-default login
 gcloud auth application-default set-quota-project <project_name>
 ```
+## Running
+
+First get the essays
+```bash
+python crawler.py
+```
+
+Then convert them
+```bash
+batch_convert.py
+```
+

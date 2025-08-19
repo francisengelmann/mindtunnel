@@ -224,6 +224,7 @@ Summary:"""
             
             # Process the text to create voice segments
             voice_segments, summary_pairs, title, date = self._create_voice_segments(text)
+            output_file = output_file.replace(Path(output_file).stem, title.replace(' ', '_'))
             print(f"Processing {len(voice_segments)} voice segment(s)...")
             
             # Write summary file if summaries were generated
