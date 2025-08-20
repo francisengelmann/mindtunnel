@@ -1,4 +1,5 @@
-MindTunnel 🧠🔊
+# MindTunnel 🧠🔊
+
 Transform written content into immersive audio experiences! 🎵 MindTunnel converts research papers, essays, and documents into high-quality audio files, allowing you to absorb knowledge during commutes, workouts, or any time reading isn't practical. 📖➡️🎧
 
 ## Installation 🛠️
