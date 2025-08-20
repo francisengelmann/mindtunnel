@@ -1,3 +1,4 @@
 google-cloud-texttospeech
+google-genai
 google-ai-generativelanguage
 bs4

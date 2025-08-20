@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import os
 from pathlib import Path
 from text_to_speech import TextToSpeechConverter  # assuming your script is named text_to_speech.py
 
