@@ -14,6 +14,19 @@
         "essays/twitter.txt",
         "audio/twitter.mp3",
       ]
+    },
+        {
+      "name": "Text2Speech Karpathy",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "text_to_speech.py",
+      "console": "integratedTerminal",
+      "args": [
+        "karpathy_2025_review.txt",
+        "karpathy_2025_review.mp3",
+        "--author-first-name", "Andrey",
+        "--author-last-name", "Karpathy",
+      ]
     }
   ]
 }

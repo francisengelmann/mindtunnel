@@ -29,7 +29,8 @@ from google.cloud import texttospeech
 class TextToSpeechConverter:
     def __init__(self, language_code: str = "en-US", voice_name: str = "en-US-Journey-D", 
                  footnote_voice: str = "en-US-Journey-F", narrator_voice: str = "en-US-Studio-O", 
-                 project: Optional[str] = None, add_summaries: bool = False, summary_batch_size: int = 4):
+                 project: Optional[str] = None, add_summaries: bool = False, summary_batch_size: int = 4,
+                 author_first_name: str = "Paul", author_last_name: str = "Graham"):
         """
         Initialize the Text-to-Speech converter.
         
@@ -56,6 +57,15 @@ class TextToSpeechConverter:
         self.project = project or "gcp-superdec"  # Default project
         self.add_summaries = add_summaries
         self.summary_batch_size = summary_batch_size
+        self.author_first_name = author_first_name.strip() if author_first_name else ""
+        self.author_last_name = author_last_name.strip() if author_last_name else ""
+        name_parts = [part for part in (self.author_first_name, self.author_last_name) if part]
+        if name_parts:
+            self.author_full_name = " ".join(name_parts)
+        else:
+            self.author_full_name = "Paul Graham"
+            name_parts = ["Paul", "Graham"]
+        self.author_short_name = name_parts[0]
         
         # Initialize Gemini client if summaries are enabled
         self.gemini_client = None
@@ -84,14 +94,14 @@ class TextToSpeechConverter:
             return None
             
         try:
-            prompt = f"""You are creating a brief overview summary of Paul Graham's essay "{essay_title}".
+            prompt = f"""You are creating a brief overview summary of {self.author_full_name}'s essay "{essay_title}".
 
 FULL ESSAY TEXT:
 {full_essay_text[:12000]}  # Use more context for overall summary
 
 Please provide a concise overview of this essay in 2-3 sentences that captures:
-1. The main topic or question Paul is addressing
-2. His key argument or insight
+1. The main topic or question {self.author_short_name} is addressing
+2. The key argument or insight {self.author_short_name} is making
 3. The broader significance or takeaway
 
 This summary will be read aloud at the beginning of the audio version, so make it engaging and accessible. Think of it as setting the stage for what listeners are about to hear.
@@ -121,33 +131,33 @@ Overview:"""
         try:
             # Create a more comprehensive prompt with full essay context
             if full_essay_context:
-                prompt = f"""You are summarizing a paragraph from Paul Graham's essay "{essay_title}". 
+                prompt = f"""You are summarizing a paragraph from {self.author_full_name}'s essay "{essay_title}". 
+ 
+ I'm providing you with the full essay context so you can better understand how this specific paragraph fits into the overall argument and themes.
 
-I'm providing you with the full essay context so you can better understand how this specific paragraph fits into the overall argument and themes.
+ FULL ESSAY CONTEXT:
+ {full_essay_context[:8000]}  # Limit context to avoid token limits
 
-FULL ESSAY CONTEXT:
-{full_essay_context[:8000]}  # Limit context to avoid token limits
+ SPECIFIC PARAGRAPH TO SUMMARIZE:
+ {paragraph}
 
-SPECIFIC PARAGRAPH TO SUMMARIZE:
-{paragraph}
+ Please provide a concise, clear summary of the main idea in this specific paragraph in 1-2 sentences.
+ Focus on the key insight or argument {self.author_short_name} is making in this paragraph and how it relates to the broader themes of the essay.
+ Be conversational and accessible, but do not say 'Hi' or something like that at the beginning of a summary.
+ Also do not explicitley state that is is a summary of that paragraph.
 
-Please provide a concise, clear summary of the main idea in this specific paragraph in 1-2 sentences.
-Focus on the key insight or argument Paul is making in this paragraph and how it relates to the broader themes of the essay.
-Be conversational and accessible, but do not say 'Hi' or something like that at the beginning of a summary.
-Also do not explicitley state that is is a summary of that paragraph.
-
-Summary:"""
+ Summary:"""
             else:
                 # Fallback to original prompt if no context provided
-                prompt = f"""You are summarizing a paragraph from Paul Graham's essay "{essay_title}". 
+                prompt = f"""You are summarizing a paragraph from {self.author_full_name}'s essay "{essay_title}". 
                 
-Please provide a concise, clear summary of the main idea in this paragraph in 1-2 sentences. 
-Focus on the key insight or argument Paul is making. Be conversational and accessible.
+ Please provide a concise, clear summary of the main idea in this paragraph in 1-2 sentences. 
+ Focus on the key insight or argument {self.author_short_name} is making. Be conversational and accessible.
 
-Paragraph:
-{paragraph}
+ Paragraph:
+ {paragraph}
 
-Summary:"""
+ Summary:"""
 
             response = self.gemini_client.models.generate_content(
                 model='gemini-2.5-flash-lite',
@@ -484,9 +494,9 @@ Summary:"""
         segments = []
         summary_pairs = []  # For summary output file
         
-        # 1. Female voice reads title with "by Paul Graham"
+        # 1. Female voice reads title with the configured author byline
         if title:
-            title_with_author = f"{title} by Paul Graham"
+            title_with_author = f"{title} by {self.author_full_name}"
             segments.append((title_with_author, self.footnote_voice))
         
         # 2. Female voice reads date
@@ -517,7 +527,7 @@ Summary:"""
         
         # 5. Female voice concludes with attribution
         if title:
-            conclusion = f"That was {title} by Paul Graham"
+            conclusion = f"That was {title} by {self.author_full_name}"
             segments.append((conclusion, self.footnote_voice))
         
         return segments, summary_pairs, title, date
@@ -683,6 +693,8 @@ def main():
     parser.add_argument("--chunk-size", type=int, default=4500, help="Maximum characters per API request (default: 4500)")
     parser.add_argument("--skip-existing", action="store_true", default=False, help="Skip conversion if MP3 file already exists")
     parser.add_argument("--add-summaries", action="store_true", default=True, help="Add Vertex AI Gemini-generated paragraph summaries")
+    parser.add_argument("--author-first-name", default="Paul", help="Author's first name for titles and summaries (default: Paul)")
+    parser.add_argument("--author-last-name", default="Graham", help="Author's last name for titles and summaries (default: Graham)")
     args = parser.parse_args()
     
     # Validate input file
@@ -711,7 +723,9 @@ def main():
         narrator_voice=args.narrator_voice,
         project=args.project,
         add_summaries=args.add_summaries,
-        summary_batch_size=4
+        summary_batch_size=4,
+        author_first_name=args.author_first_name,
+        author_last_name=args.author_last_name
     )
 
     success = converter.convert_text_file(
