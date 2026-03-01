@@ -57,6 +57,22 @@ gcloud auth application-default set-quota-project <your-project-name>
    > tmux send-keys -t mindtunnel "conda activate mindtunnel && python batch_all.py" Enter
    > ```
 
+### Website to Speech 🌐🔊
+
+Convert a single webpage directly to MP3:
+
+```bash
+python website_to_speech.py https://jakobgreenfeld.com/make-levels audio/make_levels.mp3
+```
+
+With optional voice settings:
+
+```bash
+python website_to_speech.py https://jakobgreenfeld.com/make-levels audio/make_levels.mp3 \
+   --voice en-US-Journey-D \
+   --narrator-voice en-US-Journey-F
+```
+
 ## Configuration ⚙️
 
 Ensure your Google Cloud project has:
