@@ -1,4 +1,6 @@
 google-cloud-texttospeech
 google-genai
 google-ai-generativelanguage
-bs4
+beautifulsoup4
+requests
+readability-lxml
